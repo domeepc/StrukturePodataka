@@ -38,11 +38,15 @@ int main(void) {
     unosP("Pero", "Peric", 2005, head);
     unosP("Ivo", "Ivic", 1985, head);
     unosK("Andro", "Andric", 1991, head);
-    unosK("John", "John", 1905, head);
+    unosK("Duje", "Dujic", 1905, head);
+    ispis(head->Next);
     traziPoPrez("Andric", head->Next);
-    ispis(head->Next);
     brisiEl("Pero", "Peric", head);
+    brisiEl("Andro", "Andric", head);
     ispis(head->Next);
+    traziPoPrez("Andric", head->Next);
+    free(head->ime);
+    free(head->prezime);
     free(head);
     return EXIT_SUCCESS;
 }
@@ -98,13 +102,13 @@ int traziPoPrez(char* prezime, new_osoba P) {
     while (P != NULL) {
         P = P->Next;
         if (P->prezime == prezime) {
-            printf("Osoba pronadena: %s %s\n", P->ime, P->prezime);
+            printf("Osoba pronadena po prezimenu %s: %s %s\n", prezime, P->ime, P->prezime);
             return EXIT_SUCCESS;
         }
-    }
-    if (P == NULL) {
-        printf("Osoba nije pronadena.\n");
-        return ERROR_PERSON_NOT_FOUND;
+        else if(P->prezime != prezime && P->Next == NULL) {
+            printf("Osoba po prezimenu %s nije pronadena.\n", prezime);
+            return ERROR_PERSON_NOT_FOUND;
+        }
     }
 
     return EXIT_SUCCESS;
