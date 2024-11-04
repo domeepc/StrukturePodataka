@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #define SIZE_BUFFER 1024
 #define ERROR_MEMORY_ALLOCATION (-1)
 #define ERROR_PERSON_NOT_FOUND (-2)
@@ -5,25 +6,28 @@
 #define ERROR_DURING_PRINT (-4)
 #include <stdio.h>
 #include <stdlib.h>
+#include<string.h>
 
 typedef struct osoba* new_osoba;
 
 typedef struct osoba {
-    char* ime;
-    char* prezime;
+    char ime[64];
+    char prezime[64];
     int godina;
     new_osoba Next;
 } osoba;
 
-int unosP(char* ime, char* prezime, int godina, new_osoba P);
+int unosP(char ime[64], char prezime[64], int godina, new_osoba P);
 
-int unosK(char* ime, char* prezime, int godina, new_osoba P);
+int unosK(char ime[64], char prezime[64], int godina, new_osoba P);
 
 int ispis(new_osoba P);
 
-int traziPoPrez(char* prezime, new_osoba P);
+int traziPoPrez(char prezime[64], new_osoba P);
 
-int brisiEl(char* ime, char* prez, new_osoba P);
+int brisiEl(char ime[64], char prez[64], new_osoba P);
+
+int brisiSve(new_osoba P);
 
 int main(void) {
     new_osoba head = NULL;
@@ -32,8 +36,6 @@ int main(void) {
         printf("Memory allocation error");
         return ERROR_MEMORY_ALLOCATION;
     }
-    head->ime = (char*)malloc(SIZE_BUFFER * sizeof(char));
-    head->prezime = (char*)malloc(SIZE_BUFFER * sizeof(char));
     head->Next = NULL;
     unosP("Pero", "Peric", 2005, head);
     unosP("Ivo", "Ivic", 1985, head);
@@ -45,13 +47,10 @@ int main(void) {
     brisiEl("Andro", "Andric", head);
     ispis(head->Next);
     traziPoPrez("Andric", head->Next);
-    free(head->ime);
-    free(head->prezime);
-    free(head);
     return EXIT_SUCCESS;
 }
 
-int unosP(char* ime, char* prezime, int godina, new_osoba P) {
+int unosP(char ime[64], char prezime[64], int godina, new_osoba P) {
     new_osoba Q = NULL;
     Q = (new_osoba)malloc(sizeof(osoba));
     if (Q == NULL) {
@@ -60,13 +59,13 @@ int unosP(char* ime, char* prezime, int godina, new_osoba P) {
     }
     Q->Next = P->Next;
     P->Next = Q;
-    Q->ime = ime;
-    Q->prezime = prezime;
+    strcpy(Q->ime, ime);
+    strcpy(Q->prezime, prezime);
     Q->godina = godina;
     return EXIT_SUCCESS;
 }
 
-int unosK(char* ime, char* prezime, int godina, new_osoba P) {
+int unosK(char ime[64], char prezime[64], int godina, new_osoba P) {
     new_osoba Q = NULL;
     Q = (new_osoba)malloc(sizeof(osoba));
     if (Q == NULL) {
@@ -78,8 +77,8 @@ int unosK(char* ime, char* prezime, int godina, new_osoba P) {
     }
     Q->Next = P->Next;
     P->Next = Q;
-    Q->ime = ime;
-    Q->prezime = prezime;
+    strcpy(Q->ime, ime);
+    strcpy(Q->prezime, prezime);
     Q->godina = godina;
     return EXIT_SUCCESS;
 }
@@ -98,14 +97,14 @@ int ispis(new_osoba P) {
     return EXIT_SUCCESS;
 }
 
-int traziPoPrez(char* prezime, new_osoba P) {
+int traziPoPrez(char prezime[64], new_osoba P) {
     while (P != NULL) {
         P = P->Next;
-        if (P->prezime == prezime) {
+        if (strcmp(P->prezime, prezime) == 0) {
             printf("Osoba pronadena po prezimenu %s: %s %s\n", prezime, P->ime, P->prezime);
             return EXIT_SUCCESS;
         }
-        else if(P->prezime != prezime && P->Next == NULL) {
+        else if(strcmp(P->prezime, prezime) != 0 && P->Next == NULL) {
             printf("Osoba po prezimenu %s nije pronadena.\n", prezime);
             return ERROR_PERSON_NOT_FOUND;
         }
@@ -114,12 +113,12 @@ int traziPoPrez(char* prezime, new_osoba P) {
     return EXIT_SUCCESS;
 }
 
-int brisiEl(char* ime, char* prezime, new_osoba P) {
+int brisiEl(char ime[64], char prezime[64], new_osoba P) {
     new_osoba Q = NULL;
     while (P->Next != NULL) {
         Q = P;
         P = P->Next;
-        if (P->prezime == prezime && P->ime == ime) {
+        if (strcmp(P->prezime, prezime) == 0 && strcmp(P->ime, ime) == 0) {
             Q->Next = P->Next;
             P->Next = NULL;
             free(P);
