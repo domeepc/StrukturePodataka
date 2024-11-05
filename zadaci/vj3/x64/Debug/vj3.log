@@ -1,7 +1,2 @@
 ﻿  vj3.c
-E:\StrukturePodataka\zadaci\vj3\vj3.c(115,53): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
-E:\StrukturePodataka\zadaci\vj3\vj3.c(174,9): warning C4047: 'return': 'new_osoba' differs in levels of indirection from 'int'
-E:\StrukturePodataka\zadaci\vj3\vj3.c(180,13): warning C4047: 'return': 'new_osoba' differs in levels of indirection from 'int'
-E:\StrukturePodataka\zadaci\vj3\vj3.c(185,13): warning C4047: 'return': 'new_osoba' differs in levels of indirection from 'int'
-E:\StrukturePodataka\zadaci\vj3\vj3.c(263,1): warning C4715: 'unosIspredEl': not all control paths return a value
-  vj3.vcxproj -> E:\StrukturePodataka\zadaci\x64\Debug\vj3.exe
+E:\StrukturePodataka\zadaci\vj3\vj3.c(173,9): warning C4047: 'initializing': 'int' differs in levels of indirection from 'void *'

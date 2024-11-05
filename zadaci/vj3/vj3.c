@@ -8,7 +8,7 @@
 #define ERROR_OPPENING_FILE (3)
 #include <stdio.h>
 #include <stdlib.h>
-#include<string.h>
+#include <string.h>
 #include <stdbool.h>
 
 typedef struct osoba* new_osoba;
@@ -26,13 +26,15 @@ int upisiDat(new_osoba); //d done
 
 int unosIspredEl(char[64], char[64], char[64], int, new_osoba); //b done
 
-new_osoba citajDat(); //e
+int citajDat(new_osoba P); //e
 
 int unosP(char [64], char [64], int, new_osoba);
 
 int unosK(char [64], char [64], int, new_osoba);
 
-int ispis(new_osoba P);
+void sortList(new_osoba);
+
+int ispis(new_osoba);
 
 new_osoba traziPoPrez(char [64], new_osoba);
 
@@ -60,7 +62,11 @@ int main(void) {
     unosIzaEl("Ivic", "Mate", "Matic", 1805, head);
     unosIspredEl("Matic", "Karlo", "Karlic", 1956, head);
     ispis(head->Next);
-    citajDat();
+    citajDat(head);
+    ispis(head->Next);
+    printf("Sortirana lista:\n");
+    sortList(head);
+    ispis(head->Next);
     return EXIT_SUCCESS;
 }
 
@@ -108,11 +114,12 @@ int ispis(new_osoba P) {
         printf("- %s %s %d\n", P->ime, P->prezime, P->godina);
         P = P->Next;
     }
+    printf("----------------------\n");
     return EXIT_SUCCESS;
 }
 
 new_osoba traziPoPrez(char prezime[64], new_osoba P) {
-    while (P != NULL && strcmp(P->prezime, prezime) != NULL) {
+    while (P != NULL && strcmp(P->prezime, prezime) != 0) {
         P = P->Next;
     }
     if (P == NULL) {
@@ -156,64 +163,24 @@ int upisiDat(new_osoba P) {
         P = P->Next;
     }
     fclose(fp);
+    printf("Uspjesan upis u datoteku.\n");
     return EXIT_SUCCESS;
 }
 
-new_osoba citajDat() {
+int citajDat(new_osoba P) {
     FILE* fp = NULL;
-    new_osoba Q = NULL;
-    new_osoba temp = NULL;
-    new_osoba temp_head = NULL;
-    bool isFirst = true, isEnd;
-    char buffer[SIZE_BUFFER];
     char ime[64], prezime[64];
-    int godina;
-    fp = fopen("osobe.txt", "r");
+    int god = NULL;
+    fp = fopen("osobe_unos.txt", "r");
     if (fp == NULL) {
-        printf("Greska prilikom citanja datoteke.\n");
+        printf("Datoteka ne postoji.\n");
         return ERROR_OPPENING_FILE;
     }
     while (!feof(fp)) {
-        fgets(buffer, SIZE_BUFFER, fp);
-        if (sscanf(buffer, "%s %s %d", ime, prezime, &godina) != 3) {
-            printf("Nije dobar upis elemenata.");
-            return ERROR_DURING_PRINT;
-        }
-        Q = (new_osoba)malloc(sizeof(osoba));
-        if (Q == NULL) {
-            printf("Memory allocation error");
-            return ERROR_MEMORY_ALLOCATION;
-        }
-        strcpy(Q->ime, ime);
-        strcpy(Q->prezime, prezime);
-        Q->godina = godina;
-        Q->Next = NULL;
-        if (isFirst) {
-            temp_head = Q;
-            isFirst = false;
-        }
-        else {
-            temp = temp_head;
-            isEnd = false;
-            while (!isEnd && temp != NULL) {
-                if (strcmp(temp->prezime, prezime) >= 0) {
-                    Q->Next = temp;
-                    if (temp == temp_head) {
-                        temp_head = Q;
-                    }  
-                    isEnd = true;
-                }
-                temp = temp->Next;
-            }
-            if (!isEnd) {
-                unosK(ime, prezime, godina, temp_head);
-            }
-        }
-
+            (void) fscanf(fp, "%s %s %d", ime, prezime, &god);
+            unosK(ime, prezime, god, P);
     }
-    fclose(fp);
-    ispis(temp_head);
-    return temp_head;
+    return EXIT_SUCCESS;
 }
 
 int unosIzaEl(char prezime[64], char ime[64], char prez[64],int godina, new_osoba P) {
@@ -260,4 +227,28 @@ int unosIspredEl(char prezime[64], char ime[64], char prez[64], int godina, new_
     strcpy(Q->ime, ime);
     strcpy(Q->prezime, prez);
     Q->godina = godina;
+    return EXIT_SUCCESS;
+}
+
+void sortList(new_osoba P) {
+    new_osoba Q, prev, temp, end;
+
+    end = NULL;
+    while (P->Next != end) //P->Next != NULL
+    {
+        prev = P;
+        Q = P->Next;
+        while (Q->Next != end) {
+            if (strcmp(Q->prezime, Q->Next->prezime) < 0) {
+                temp = Q->Next;
+                prev->Next = temp;
+                Q->Next = temp->Next;
+                temp->Next = Q;
+                Q = temp;
+            }
+            prev = Q;
+            Q = Q->Next;
+        }
+        end = Q;
+    }
 }
