@@ -18,8 +18,6 @@ pol createEl(int, int);
 
 int scanFile(pol, pol);
 
-void errorCheck(int);
-
 int sumPol(pol, pol, pol);
 
 int mulPol(pol, pol, pol);
@@ -56,7 +54,7 @@ int main() {
 pol createEl(int coef, int exp) {
 	pol Q = (pol)malloc(sizeof(polinom));
 	if (Q == NULL) {
-		errorCheck(ERROR_MEMORY_ALLOCATION);
+		printf("Greska u alociranju memorije.\n");
 		return NULL;
 	}
 	Q->coef = coef;
@@ -65,33 +63,19 @@ pol createEl(int coef, int exp) {
 	return Q;
 }
 
-void errorCheck(int error) {
-	switch (error) {
-	case ERROR_MEMORY_ALLOCATION:
-		printf("Greska pri alokaciji memroije.\n");
-		break;
-	case ERROR_READING_FILE:
-		printf("Greska pri citanju datoteke.\n");
-		break;
-	case ERROR_READING_POL:
-		printf("Greska pri citanju polinoma.\n");
-		break;
-	}
-}
-
 int scanFile(pol First, pol Second) {
 	FILE* fp = NULL;
 	char* buffer;
 	int coef, exp, byteSize, count, red = 0;
 	fp = fopen("polinomi.txt", "r");
 	if (fp == NULL) {
-		errorCheck(ERROR_READING_FILE);
+		printf("Greska u citanju filea.\n");
 		return ERROR_READING_FILE;
 	}
 
 	buffer = (char*)malloc(sizeof(char)*BUFFER_SIZE);
 	if (buffer == NULL) {
-		errorCheck(ERROR_MEMORY_ALLOCATION);
+		printf("Greska u alociranju memorije.\n");
 		return ERROR_MEMORY_ALLOCATION;
 	}
 
@@ -101,7 +85,7 @@ int scanFile(pol First, pol Second) {
 		while (strlen(buffer) > 0) {
 		count = sscanf(buffer, "%d %d %n", &coef, &exp, &byteSize);
 			if (count != 2) {
-				errorCheck(ERROR_READING_POL);
+				printf("Greska u citanju polinoma.\n");
 				return ERROR_READING_POL;
 			}
 			if (red == 1) {
@@ -133,7 +117,7 @@ int ispis(pol Q) {
 int sortedEntry(pol Q, int c, int e) {
 	pol temp = createEl(c, e);
 	if (temp == NULL) {
-		errorCheck(ERROR_MEMORY_ALLOCATION);
+		printf("Greska u alociranju memorije.\n");
 		return ERROR_MEMORY_ALLOCATION;
 	}
 
