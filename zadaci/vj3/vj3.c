@@ -19,13 +19,13 @@ typedef struct osoba {
   new_osoba Next;
 } osoba;
 
-int unosIzaEl(char[64], char[64], char[64], int, new_osoba); // a done
+int unosIzaEl(char[64], char[64], char[64], int, new_osoba);  // a done
 
-int upisiDat(new_osoba); // d done
+int upisiDat(new_osoba);  // d done
 
-int unosIspredEl(char[64], char[64], char[64], int, new_osoba); // b done
+int unosIspredEl(char[64], char[64], char[64], int, new_osoba);  // b done
 
-int citajDat(new_osoba P); // e
+int citajDat(new_osoba P);  // e
 
 int unosP(char[64], char[64], int, new_osoba);
 
@@ -234,7 +234,7 @@ void sortList(new_osoba P) {
   new_osoba Q, prev, temp, end;
 
   end = NULL;
-  while (P->Next != end) // P->Next != NULL
+  while (P->Next != end)  // P->Next != NULL
   {
     prev = P;
     Q = P->Next;
