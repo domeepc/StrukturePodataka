@@ -1,2 +1,2 @@
-﻿  Source.cpp
-E:\StrukturePodataka\zadaci\vj5\Source.cpp(40,1): warning C4715: 'Postfix::calcPostfix': not all control paths return a value
+﻿  vj5.c
+  vj5.vcxproj -> E:\StrukturePodataka\zadaci\x64\Debug\vj5.exe
