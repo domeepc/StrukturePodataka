@@ -1,5 +1,4 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -127,7 +126,7 @@ int scanFile(receiptPosition recHead) {
         }
         sprintf(rec->receiptDate, "%d-%d-%d", year, month, day);
         counter++;
-      } 
+      }
       while (!feof(fp1)) {
         fgets(buffer, BUFFER_SIZE, fp1);
         count = sscanf(buffer, "%s %d %lf", name, &quant, &price);
