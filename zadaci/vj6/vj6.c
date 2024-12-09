@@ -100,12 +100,11 @@ int scanFile(receiptPosition recHead) {
   }
   while (!feof(fp)) {
     fgets(buffer, BUFFER_SIZE, fp);
-    count = sscanf(buffer, "%s", filename);
+    count = sscanf(buffer, "%[^\n]", filename);
     if (count != 1) {
       checkError(ERROR_WFORMAT);
       return ERROR_WFORMAT;
     } else {
-      filename[BUFFER_SIZE - 1] = '\0';
       rec = createReceipt();
       if (rec == NULL) {
         checkError(ERROR_MEM_ALL);
@@ -126,9 +125,9 @@ int scanFile(receiptPosition recHead) {
           checkError(ERROR_WFORMAT);
           return (ERROR_WFORMAT);
         }
-        sprintf(rec->receiptDate, "%d-%d-%d", day, month, year);
+        sprintf(rec->receiptDate, "%d-%d-%d", year, month, day);
         counter++;
-      }
+      } 
       while (!feof(fp1)) {
         fgets(buffer, BUFFER_SIZE, fp1);
         count = sscanf(buffer, "%s %d %lf", name, &quant, &price);
