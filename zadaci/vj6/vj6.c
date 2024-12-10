@@ -30,6 +30,8 @@ void static checkError(int err) {
   }
 }
 
+void searchReceipt(receiptPosition, char *, char *, char *);
+
 typedef struct _article {
   char name[BUFFER_SIZE];
   int quantity;
@@ -48,13 +50,12 @@ receiptPosition createReceipt();
 
 int scanFile(receiptPosition);
 
-void print_receipts(receiptPosition);
-
 int main() {
   Receipt receipts;
   receipts.next = NULL;
   scanFile(&receipts);
-  print_receipts(receipts.next);
+  searchReceipt(&receipts, "2004-11-14", "2005-12-12", "Ananas");
+  searchReceipt(&receipts, "2004-11-14", "2005-12-12", "Avokado");
   return EXIT_SUCCESS;
 }
 
@@ -163,7 +164,6 @@ int scanFile(receiptPosition recHead) {
         }
         if (tempArt1->next != NULL &&
             strcmp(tempArt1->next->name, tempArt->name) == 0) {
-          printf("usao\n");
           tempArt1->next->quantity += tempArt->quantity;
 
         } else {
@@ -171,7 +171,6 @@ int scanFile(receiptPosition recHead) {
           tempArt->next = tempArt1->next;
           tempArt1->next = tempArt;
           tempArt = tempPrev->next;
-          continue;
         }
         tempArt = tempArt->next;
         tempPrev = tempPrev->next;
@@ -186,14 +185,23 @@ int scanFile(receiptPosition recHead) {
   return EXIT_SUCCESS;
 }
 
-void print_receipts(receiptPosition rec) {
+void searchReceipt(receiptPosition rec, char *date1, char *date2, char *name) {
+  int count = 0;
   while (rec != NULL) {
-    printf("----------\n%s\n", rec->receiptDate);
-    while (rec->articleHead.next != NULL) {
-      printf("%s %d %.2lf\n", rec->articleHead.next->name,
-             rec->articleHead.next->quantity, rec->articleHead.next->price);
-      rec->articleHead.next = rec->articleHead.next->next;
+    if (strcmp(rec->receiptDate, date1) >= 0 &&
+        strcmp(rec->receiptDate, date2) <= 0) {
+      articlePosition art = rec->articleHead.next;
+      while (art != NULL) {
+        if (strcmp(art->name, name) == 0) {
+          printf("%s %d %.2lf\n", art->name, art->quantity, art->price);
+          count++;
+        }
+        art = art->next;
+      }
     }
     rec = rec->next;
+  }
+  if (count == 0) {
+    printf("No articles found.\n");
   }
 }
