@@ -16,17 +16,17 @@ typedef struct _article *articlePosition;
 
 void static checkError(int err) {
   switch (err) {
-    case ERROR_MEM_ALL:
-      printf("Error while alocating memory.\n");
-      break;
-    case ERROR_FILE_NFOUND:
-      printf("Error file not found.\n");
-      break;
-    case ERROR_WFORMAT:
-      printf("Error wrong format.\n");
-      break;
-    default:
-      break;
+  case ERROR_MEM_ALL:
+    printf("Error while alocating memory.\n");
+    break;
+  case ERROR_FILE_NFOUND:
+    printf("Error file not found.\n");
+    break;
+  case ERROR_WFORMAT:
+    printf("Error wrong format.\n");
+    break;
+  default:
+    break;
   }
 }
 
@@ -87,11 +87,11 @@ receiptPosition createReceipt() {
 
 int scanFile(receiptPosition recHead) {
   FILE *fp = NULL, *fp1 = NULL;
-  receiptPosition rec = NULL;
-  articlePosition art = NULL;
+  receiptPosition rec = NULL, tempRec = NULL;
+  articlePosition art = NULL, tempArt = NULL, tempArt1 = NULL, tempPrev = NULL;
   double price;
   char filename[BUFFER_SIZE], buffer[BUFFER_SIZE], name[BUFFER_SIZE];
-  int count, quant, counter = 0, day, month, year;
+  int count, quant, day, month, year;
   fp = fopen("racuni.txt", "r");
   if (fp == NULL) {
     checkError(ERROR_FILE_NFOUND);
@@ -103,47 +103,86 @@ int scanFile(receiptPosition recHead) {
     if (count != 1) {
       checkError(ERROR_WFORMAT);
       return ERROR_WFORMAT;
-    } else {
-      rec = createReceipt();
-      if (rec == NULL) {
+    }
+    rec = createReceipt();
+    if (rec == NULL) {
+      checkError(ERROR_MEM_ALL);
+      return ERROR_MEM_ALL;
+    }
+    fp1 = fopen(filename, "r");
+    if (fp1 == NULL) {
+      checkError(ERROR_FILE_NFOUND);
+      return ERROR_FILE_NFOUND;
+    }
+    fgets(buffer, BUFFER_SIZE, fp1);
+    count = sscanf(buffer, "%d-%d-%d", &day, &month, &year);
+    if (count != 3) {
+      checkError(ERROR_WFORMAT);
+      return (ERROR_WFORMAT);
+    }
+    sprintf(rec->receiptDate, "%d-%d-%d", year, month, day);
+    while (!feof(fp1)) {
+      fgets(buffer, BUFFER_SIZE, fp1);
+      count = sscanf(buffer, "%s %d %lf", name, &quant, &price);
+      if (count != 3) {
+        checkError(ERROR_WFORMAT);
+        return ERROR_WFORMAT;
+      }
+      art = createArticle(name, quant, price);
+      if (art == NULL) {
         checkError(ERROR_MEM_ALL);
         return ERROR_MEM_ALL;
       }
-      rec->next = recHead->next;
-      recHead->next = rec;
-      fp1 = fopen(filename, "r");
-      if (fp1 == NULL) {
-        checkError(ERROR_FILE_NFOUND);
-        return ERROR_FILE_NFOUND;
-      }
-      counter = 0;
-      while (counter < 1) {
-        fgets(buffer, BUFFER_SIZE, fp1);
-        count = sscanf(buffer, "%d-%d-%d", &day, &month, &year);
-        if (count != 3) {
-          checkError(ERROR_WFORMAT);
-          return (ERROR_WFORMAT);
-        }
-        sprintf(rec->receiptDate, "%d-%d-%d", year, month, day);
-        counter++;
-      }
-      while (!feof(fp1)) {
-        fgets(buffer, BUFFER_SIZE, fp1);
-        count = sscanf(buffer, "%s %d %lf", name, &quant, &price);
-        if (count != 3) {
-          checkError(ERROR_WFORMAT);
-          return ERROR_WFORMAT;
-        }
-        art = createArticle(name, quant, price);
-        if (art == NULL) {
-          checkError(ERROR_MEM_ALL);
-          return ERROR_MEM_ALL;
-        }
-        art->next = rec->articleHead.next;
-        rec->articleHead.next = art;
+      tempArt = &rec->articleHead;
+      while (tempArt->next != NULL &&
+             strcmp(tempArt->next->name, art->name) < 0)
+        tempArt = tempArt->next;
+
+      if (tempArt->next != NULL &&
+          strcmp(tempArt->next->name, art->name) == 0) {
+        tempArt->next->quantity += art->quantity;
+      } else {
+        art->next = tempArt->next;
+        tempArt->next = art;
       }
     }
+    tempRec = recHead;
+    while (tempRec->next != NULL &&
+           strcmp(tempRec->next->receiptDate, rec->receiptDate) < 0) {
+      tempRec = tempRec->next;
+    }
+    if (tempRec->next != NULL &&
+        strcmp(tempRec->next->receiptDate, rec->receiptDate) == 0) {
+      tempArt = rec->articleHead.next;
+      tempPrev = &rec->articleHead;
+      while (tempArt != NULL) {
+        tempArt1 = &tempRec->next->articleHead;
+        while (tempArt1->next != NULL &&
+               strcmp(tempArt1->next->name, tempArt->name) < 0) {
+          tempArt1 = tempArt1->next;
+        }
+        if (tempArt1->next != NULL &&
+            strcmp(tempArt1->next->name, tempArt->name) == 0) {
+          printf("usao\n");
+          tempArt1->next->quantity += tempArt->quantity;
+
+        } else {
+          tempPrev->next = tempArt->next;
+          tempArt->next = tempArt1->next;
+          tempArt1->next = tempArt;
+          tempArt = tempPrev->next;
+          continue;
+        }
+        tempArt = tempArt->next;
+        tempPrev = tempPrev->next;
+      }
+    } else {
+      rec->next = tempRec->next;
+      tempRec->next = rec;
+    }
+    fclose(fp1);
   }
+  fclose(fp);
   return EXIT_SUCCESS;
 }
 
